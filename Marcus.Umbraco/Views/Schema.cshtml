@@ -284,7 +284,7 @@
                 </div>
                 <div class="modal-body">
                   <div class="py-1">
-                    <form class="form" novalidate="" onsubmit="addEmployee();">
+                    <div class="form" novalidate="">
                       <div class="row">
                         <div class="col">
                           <div class="row">
@@ -304,7 +304,7 @@
                                 <label>Date Of Birth</label>
                                 <input class="form-control"
                                        type="datetime-local" 
-                                       id="dateOfBirth" >
+                                       id="dateOfBirth" />
                               </div>
                             </div>
                           </div>
@@ -335,12 +335,12 @@
                       </div>
                       <div class="row">
                         <div class="col d-flex justify-content-end">
-                          <button class="btn btn-primary" type="submit">
-                            Save Changes
+                          <button class="btn btn-primary" onclick="addEmployee()">
+                            Save
                           </button>
                         </div>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -360,7 +360,6 @@
       }
     </style>
     <script type="text/javascript">
-
         let url = "http://localhost:25523/api/employee";
         let selectedEmployees = [];
 
@@ -369,27 +368,27 @@
             email : "",
             dateOfBirth : null,
             age : 0
-        }
+        };
         
-        function addEmployee(){
+        function addEmployee() {
+            console.log(123);
             console.log($('#fullName').val());
             console.log($('#email').val());
             console.log($('#dateOfBirth').val());
             console.log($('#age').val());
-
             return;
-            $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(newEmployee),
-            dataType: 'json',
-            success: function (response) {
-                if(response.status === 200){
-                    console.log('success');
-                    console.log(newEmployee);
-                }
-            }
-        });
+            //$.ajax({
+            //url: url,
+            //type: 'POST',
+            //data: JSON.stringify(newEmployee),
+            //dataType: 'json',
+            //success: function (response) {
+            //    if(response.status === 200){
+            //        console.log('success');
+            //        console.log(newEmployee);
+            //    }
+            //})
+        }
 
         function onSelectEmployee(employeeName){
             selectedEmployees.push(employeeName);
@@ -413,6 +412,7 @@
             }
             })
         }
+
     </script>
   </body>
 </html>
