@@ -2,9 +2,11 @@
 {
     public class Employee
     {
-        public string? fullName { get; set; }
-        public string? email { get; set; }
-        public DateTime dateOfBirth { get; set; }
-        public int age { get; set; }
+        public int Id { get; set; }
+        public string? ContentName { get; set; }
+        public string? FullName { get; set; }
+        public string? Email { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public int Age { get; set; }
     }
 }
