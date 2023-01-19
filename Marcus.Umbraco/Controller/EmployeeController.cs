@@ -3,10 +3,12 @@ using Umbraco.Cms.Web.Common;
 using Marcus.Umbraco.Model;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Marcus.Umbraco.Controller
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class EmployeeController : ControllerBase
     {
         private readonly UmbracoHelper _umbracoHelper;
@@ -99,6 +101,54 @@ namespace Marcus.Umbraco.Controller
                 }
             }
             catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public ActionResult<EmployeeModel> Delete(int id)
+        {
+            try
+            {
+                var content = _contentService.GetById(id);
+                if (content == null)
+                {
+                    return NotFound("Could not delete. Employee is not exist.");
+                }
+                else
+                {
+                    _contentService.Delete(content);
+                    return Ok(content.Id);
+                }
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut]
+        public ActionResult Update([FromBody] EmployeeModel newVersion)
+        {
+            try
+            {
+                var content = _contentService.GetById(newVersion.Id);
+                if(content == null)
+                {
+                    return NotFound("Could not update.Employee is not exist.");
+                }
+                else
+                {
+                    content.SetValue("fullName", newVersion.FullName);
+                    content.SetValue("email", newVersion.Email);
+                    content.SetValue("dateOfBirth", newVersion.DateOfBirth);
+                    content.SetValue("age", newVersion.Age);
+                    _contentService.SaveAndPublish(content);
+                    return Ok();
+                }
+            }
+            catch(Exception e)
             {
                 return BadRequest(e.Message);
             }

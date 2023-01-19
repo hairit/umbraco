@@ -16,12 +16,14 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha512-CryKbMe7sjSCDPl18jtJI5DR5jtkUWxPXWaLCst6QjH8wxDexfRJic2WRmRXmstr2Y8SxDDWuBO6CQC6IE4KTA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
   </head>
   <body>
     <link
       href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
       rel="stylesheet"
     />
+    <div data-toggle="modal" data-target="#user-form-modal" id="modal-controller"></div>
     <div class="container">
       <div class="row flex-lg-nowrap">
         <div class="col">
@@ -47,21 +49,6 @@
                       <table class="table table-bordered">
                         <thead>
                           <tr>
-                            <th class="align-top">
-                              <div
-                                class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0"
-                              >
-                                <input
-                                  type="checkbox"
-                                  class="custom-control-input"
-                                  id="all-items"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="all-items"
-                                ></label>
-                              </div>
-                            </th>
                             <th>Full Name</th>
                             <th class="max-width">Email</th>
                             <th class="sortable">Date Of Birth</th>
@@ -70,10 +57,9 @@
                           </tr>
                         </thead>
                         <tbody id="employee-list">
-                                                @{
-                                                    var selection = Umbraco.ContentAtXPath("//employee")
-                                                                           .Where(x => x.IsVisible());
-                                                }
+                               @{
+                                var selection = Umbraco.ContentAtXPath("//employee").Where(x => x.IsVisible());
+                                }
                             	@foreach (var item in selection)
                             	{
                                                     EmployeeModel employee = new EmployeeModel
@@ -85,46 +71,31 @@
                                                          DateOfBirth = item.Value<DateTime>("dateOfBirth"),
                                                          Age = item.Value<int>("age")
                                                     };
-                                                    <tr>
-  <td class="align-middle text-center" id="@employee.Id">
-    <div
-      class="bg-light d-inline-flex justify-content-center align-items-center align-top"
-      style="width: 35px; height: 35px; border-radius: 3px"
-    >
-      @*@item.Value("fullName")*@
-      @employee.FullName
-    </div>
-  </td>
-  <td class="text-nowrap align-middle">@*@item.Value("email")*@
-    @employee.Email
-  </td>
-  <td class="text-nowrap align-middle">
-    <span>@*@item.Value("dateOfBirth")*@
-    @employee.DateOfBirth</span>
-  </td>
-  <td class="text-center align-middle">
-    <span>@*@item.Value("age")*@
-    @employee.Age
-    </span>
-  </td>
-  <td class="text-center align-middle">
-    <div class="btn-group align-top">
-      <button
-        class="btn btn-sm btn-outline-secondary badge"
-        type="button"
-        data-toggle="modal"
-        data-target="#user-form-modal"
-        onclick="onClickEditEmployee(@employee.FullName,@employee.Email,@employee.DateOfBirth,@employee.Age)"
-      >
-        Edit
-      </button>
-          <button class="btn btn-sm btn-outline-secondary badge" onclick="deleteEmployee(@employee.Id)" type="button">
-        <i class="fa fa-trash"></i>
-      </button>
-    </div>
-  </td>
-</tr>
-
+                                                    <tr id="@employee.Id">
+                                                        <td class="align-middle">
+                                                             <div class="bg-light d-inline-flex align-items-center align-top"
+                                                                  style="width: 100%; height: 35px; border-radius: 3px">@employee.FullName</div>
+                                                        </td>
+                                                        <td class="text-nowrap align-middle">@employee.Email</td>
+                                                        <td class="text-nowrap align-middle">
+                                                            <span>@employee.DateOfBirth.ToString("MM/dd/yyyy")</span>
+                                                        </td>
+                                                        <td class="text-center align-middle"><span>@employee.Age</span></td>
+                                                        <td class="text-center align-middle">
+                                                            <div class="btn-group align-top">
+                                                                <button class="btn btn-sm btn-outline-secondary badge"
+                                                                    type="button"
+                                                                    data-toggle="modal"
+                                                                    data-target="#user-form-modal"
+                                                                    onclick="onClickEditEmployee('@employee.Id','@employee.FullName','@employee.Email','@employee.DateOfBirth.ToString("s")','@employee.Age')">
+                                                                    Edit
+                                                                </button>
+                                                                <button class="btn btn-sm btn-outline-secondary badge" onclick="deleteEmployee('@employee.Id')" type="button">
+                                                                        <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                             	}
                         </tbody>
                       </table>
@@ -169,8 +140,7 @@
                       class="btn btn-success btn-block"
                       type="button"
                       data-toggle="modal"
-                      data-target="#user-form-modal"
-                    >
+                      data-target="#user-form-modal">
                       New Employee
                     </button>
                   </div>
@@ -277,7 +247,7 @@
 
           <div
             class="modal fade"
-            role="dialog"
+            @*role="dialog"*@
             tabindex="-1"
             id="user-form-modal"
           >
@@ -305,6 +275,7 @@
                                   placeholder="Ex: Marcus"
                                 />
                               </div>
+                              <label id="fullName-warning" style="color :red">Full Name is required!</label>
                             </div>
                             <div class="col">
                               <div class="form-group">
@@ -313,6 +284,7 @@
                                        type="datetime-local" 
                                        id="dateOfBirth" />
                               </div>
+                              <label id="date-warning" style="color :red">Date of birth is required!</label>
                             </div>
                           </div>
                           <div class="row">
@@ -326,6 +298,7 @@
                                   placeholder="marcus@example.com"
                                 />
                               </div>
+                              <label id="email-warning" style="color :red">Email is required!</label>
                             </div>
                             <div class="col">
                               <div class="form-group">
@@ -336,6 +309,7 @@
                                   type="number"
                                 />
                               </div>
+                              <label id="age-warning" style="color :red">Age must greater than 0!</label>
                             </div>
                           </div>
                         </div>
@@ -366,106 +340,179 @@
         max-width : 100% !important;
       }
     </style>
+    <script type="text/javascript" src="../js/schema.js"></script>
     <script type="text/javascript">
-        let url = "http://localhost:1610/api/employee";
-        let selectedEmployees = [];
+let url = "http://localhost:1610/api/employee";
+let selectedEmployees = [];
 
-        let editedEmployeeId = 0;
-        let isEdit = false;
+let editedEmployeeId = 0;
+let isEdit = false;
 
-        function onClickEditEmployee(fullName,email,dateOfBirth,age){
-            isEdit = true;
-            editedEmployeeId = employee.employeeId;
-            $('#fullName').val(fullName);
-            $('#email').val(email);
-            $('#dateOfBirth').val(dateOfBirth);
-            $('#age').val(age);
+resetWarning();
+
+function onClickEditEmployee(id, fullName, email, dateOfBirth, age) {
+    isEdit = true;
+    editedEmployeeId = id;
+    $('#fullName').val(fullName);
+    $('#email').val(email);
+    $('#dateOfBirth').val(dateOfBirth);
+    $('#age').val(age);
+}
+
+function onClickNewEmployee(employee) {
+    isEdit = false;
+    editedEmployeeId = 0;
+    $('#fullName').val("");
+    $('#email').val("");
+    $('#dateOfBirth').val("");
+    $('#age').val(0);
+}
+
+function editEmployee() {
+    const errors = validate();
+    if(errors > 0){
+        return;
+    }
+    let newEmployee = {
+        id: editedEmployeeId,
+        fullName: $('#fullName').val(),
+        email: $('#email').val(),
+        dateOfBirth: $('#dateOfBirth').val(),
+        age: $('#age').val(),
+    }
+     $.ajax({
+     url: url,
+     headers: {
+           'Accept': 'application/json',
+           'Content-Type': 'application/json'
+     },
+     type: 'PUT',
+     data: JSON.stringify(newEmployee),
+     success: function (response) {
+          resetWarning();
+          $('#modal-controller').click();
+          $('#' + editedEmployeeId).replaceWith(renderNewEmployee(newEmployee.id,newEmployee.fullName,newEmployee.email,newEmployee.dateOfBirth,newEmployee.age))
+     }
+     });
+}
+
+function addEmployee() {
+    const errors = validate();
+    if(errors > 0){
+        return;
+    }
+    let newEmployee = {
+        fullName: $('#fullName').val(),
+        email: $('#email').val(),
+        dateOfBirth: $('#dateOfBirth').val(),
+        age: $('#age').val(),
+    }
+
+    $.ajax({
+        url: url,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        type: 'POST',
+        data: JSON.stringify(newEmployee),
+        dataType: 'json',
+        success: function (response) {
+            resetWarning();
+            $('#modal-controller').click();
+            $('#employee-list').append(renderNewEmployee(response.id, response.fullName, response.email, response.dateOfBirth, response.age));
         }
+    });
+}
 
-        function onClickNewEmployee(employee) {
-            isEdit = false;
-            editedEmployeeId = 0;
-            $('#fullName').val("");
-            $('#email').val("");
-            $('#dateOfBirth').val(null);
-            $('#age').val(0);
-        }
+function onSave() {
+    resetWarning();
+    if (isEdit) {
+        editEmployee();
+    } else {
+        addEmployee();
+    }
+}
 
-        function editEmployee(){
-            console.log("edit");
-        }
-        
-        function addEmployee() {
-            let newEmployee = {
-                fullName: $('#fullName').val(),
-                email: $('#email').val(),
-                dateOfBirth: $('#dateOfBirth').val(),
-                age: $('#age').val(),
-            }
+function deleteEmployee(employeeId) {
+    $.ajax({
+        url: url + '/' + employeeId,
+        type: 'DELETE',
+        success: function (response) {
+            $('#' + employeeId.toString()).remove();
+        },
+    })
+}
 
-            $.ajax({
-            url: url,
-            headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-            },
-            type: 'POST',
-            data: JSON.stringify(newEmployee),
-            dataType: 'json',
-            success: function (response) {
-                $('#employee-list').append(renderNewEmployee(response.fullName,response.email,response.dateOfBirth,response.age));
-            }
-            });
-        }
+function renderNewEmployee(id, fullName, email, dateOfBirth, age) {
+    var date = new Date(dateOfBirth);
+            var dateOfBirthFormat = ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
+    //var dateOfBirthFormatMoment = moment(dateOfBirth).format('L');
+    return "<tr id=\"" + id + "\">" +
+        "<td class=\"align-middle\">" +
+        "<div class=\"bg-light d-inline-flex align-items-center align-top\" " +
+        "style=\"width: 100%; height: 35px; border-radius: 3px\">" + fullName + "</div>" +
+        "</td>" +
+        "<td class=\"text-nowrap align-middle\">" + email + "</td>" +
+        "<td class=\"text-nowrap align-middle\">" +
+        "<span>" + dateOfBirthFormat + "</span>" +
+        "</td>" +
+        "<td class=\"text-center align-middle\"><span>" + age + "</span></td>" +
+        "<td class=\"text-center align-middle\">" +
+        "<div class=\"btn-group align-top\">" +
+        "<button class=\"btn btn-sm btn-outline-secondary badge\"" +
+        "type=\"button\"" +
+        "data-toggle=\"modal\" data-target=\"#user-form-modal\"" +
+        "onclick=\"onClickEditEmployee(" + `'${id}','${fullName}','${email}','${dateOfBirth}','${age}'` + ")\">" +
+        "Edit" +
+        "</button>" +
+        "<button class=\"btn btn-sm btn-outline-secondary badge\" onclick=\"deleteEmployee('" + `${id}` + "')\" type=\"button\">" +
+        "<i class=\"fa fa-trash\"></i>" +
+        "</button>" +
+        "</div>" +
+        "</td>" +
+        "</tr>";
+}
 
-        function onSave(){
-            if(isEdit){
-                editEmployee();
-            }else{
-                addEmployee();
-            }
-        }
+function validate() {
+    let countErrors = [];
+    if ($('#fullName').val() === "") {
+        $('#fullName-warning').show();
+        countErrors++;
+    }
+    if ($('#dateOfBirth').val() === "") {
+        $('#date-warning').show();
+        countErrors++;
+    }
+    if ($('#email').val() === "") {
+        $('#email-warning').show();
+        countErrors++;
+    } else {
+        //if (ValidateEmail($('#email').val()) === false) {
+        //    $('#email-warning').text("Email is invalid!");
+        //    $('#email-warning').show();
+        //    countErrors++;
+        //}
+    }
+    if ($('#age').val() <= 0) {
+        $('#age-warning').show();
+        countErrors++;
+    }
+    return countErrors;
+}
 
-        function deleteEmployee(employeeId){
-            console.log(employeeId);
-            $.ajax({
-            url: url + '/' + employeeId,
-            type: 'DELETE',
-            success: function (response) {
-                if(response.status === 200)
-                {
-                   
-                }
-            }
-            })
-        }
-
-        function renderNewEmployee(fullName,email,dateOfBirth,age){
-            return  "<tr>"  +
-                        "<td class=\"align-middle text-center\">" +
-                             "<div class=\"bg-light d-inline-flex justify-content-center align-items-center align-top\" style=\"width: 35px; height: 35px; border-radius: 3px\">" +
-                                fullName +
-                             "</div>" +
-                        "</td>" +
-                        "<td class=\"text-nowrap align-middle\">" + email + "</td>" +
-                "<td class=\"text-nowrap align-middle\"><span>" + dateOfBirth + "</span></td>" +
-                        "<td class=\"text-center align-middle\"><span>" + age + "</span></td>" + 
-                        "<td class=\"text-center align-middle\">" +
-                            "<div class=\"btn-group align-top\">" +
-                "<button class=\"btn btn-sm btn-outline-secondary badge\" type=\"button\" data-toggle=\"modal\" data-target=\"#user-form-modal\" onclick=\"onClickEditEmployee("+fullName+","+email+","+dateOfBirth+","+age+")"+">Edit</button>" +
-                    "<button class=\"btn btn-sm btn-outline-secondary badge\" type=\"button\">" + 
-                                     "<i class=\"fa fa-trash\"></i>" + 
-                                "</button>" +
-                            "</div>" +
-                        "</td>" +
-                    "</tr>";
-        }
+function resetWarning() {
+    $('#fullName-warning').hide();
+    $('#date-warning').hide();
+    $('#email-warning').hide();
+    $('#age-warning').hide();
+}
     </script>
   </body>
 </html>
 
 @{
-	Layout = null;
+	Layout = null; 
 }
 
 
