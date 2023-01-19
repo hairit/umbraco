@@ -19,14 +19,14 @@ namespace Marcus.Umbraco.Controller
         }
 
         [HttpGet]
-        public ActionResult<List<Employee>> Get()
+        public ActionResult<List<EmployeeModel>> Get()
         {
             var employees = _umbracoHelper.ContentAtXPath("//employee").Where(x => x.IsVisible());
-            List<Employee> responseData = new List<Employee>();
+            List<EmployeeModel> responseData = new List<EmployeeModel>();
 
             foreach(var employee in employees)
             {
-                responseData.Add(new Employee
+                responseData.Add(new EmployeeModel
                 {
                     ContentName = employee.Name,
                     Id = employee.Id,
@@ -42,7 +42,7 @@ namespace Marcus.Umbraco.Controller
 
         [HttpGet]
         [Route("{name}")]
-        public ActionResult<Employee> GetByName(string name)
+        public ActionResult<EmployeeModel> GetByName(string name)
         {
             var employees = _umbracoHelper.ContentAtXPath("//employee")
                                           .Where(x => x.IsVisible() && x.Name == name)
@@ -50,7 +50,7 @@ namespace Marcus.Umbraco.Controller
             if(employees.Count > 0)
             { 
                 var employee = employees.First();
-                var responseData = new Employee
+                var responseData = new EmployeeModel
                 {
                     ContentName = employee.Name,
                     Id = employee.Id,
@@ -68,7 +68,7 @@ namespace Marcus.Umbraco.Controller
         }
 
         [HttpPost]
-        public ActionResult<Employee> Post([FromBody] Employee employee)
+        public ActionResult<EmployeeModel> Post([FromBody] EmployeeModel employee)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Marcus.Umbraco.Controller
                     newEmployee.SetValue("age", employee.Age);
                     _contentService.SaveAndPublish(newEmployee);
 
-                    return Ok(new Employee
+                    return Ok(new EmployeeModel
                     {
                         Id = newEmployee.Id,
                         ContentName = newEmployee.Name,

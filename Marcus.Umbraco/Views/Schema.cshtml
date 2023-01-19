@@ -76,21 +76,36 @@
                                                 }
                             	@foreach (var item in selection)
                             	{
-                                    <tr>
-  <td class="align-middle text-center">
+                                                    EmployeeModel employee = new EmployeeModel
+                                                    {
+                                                         Id = item.Id,
+                                                         ContentName = item.Name,
+                                                         FullName = item.Value<string>("fullName"),
+                                                         Email = item.Value<string>("email"),
+                                                         DateOfBirth = item.Value<DateTime>("dateOfBirth"),
+                                                         Age = item.Value<int>("age")
+                                                    };
+                                                    <tr>
+  <td class="align-middle text-center" id="@employee.Id">
     <div
       class="bg-light d-inline-flex justify-content-center align-items-center align-top"
       style="width: 35px; height: 35px; border-radius: 3px"
     >
-      @item.Value("fullName")
+      @*@item.Value("fullName")*@
+      @employee.FullName
     </div>
   </td>
-  <td class="text-nowrap align-middle">@item.Value("email")</td>
+  <td class="text-nowrap align-middle">@*@item.Value("email")*@
+    @employee.Email
+  </td>
   <td class="text-nowrap align-middle">
-    <span>@item.Value("dateOfBirth")</span>
+    <span>@*@item.Value("dateOfBirth")*@
+    @employee.DateOfBirth</span>
   </td>
   <td class="text-center align-middle">
-    <span>@item.Value("age")</span>
+    <span>@*@item.Value("age")*@
+    @employee.Age
+    </span>
   </td>
   <td class="text-center align-middle">
     <div class="btn-group align-top">
@@ -99,11 +114,11 @@
         type="button"
         data-toggle="modal"
         data-target="#user-form-modal"
-        onclick="onClickEditEmployee(@item)"
+        onclick="onClickEditEmployee(@employee.FullName,@employee.Email,@employee.DateOfBirth,@employee.Age)"
       >
         Edit
       </button>
-      <button class="btn btn-sm btn-outline-secondary badge" type="button">
+          <button class="btn btn-sm btn-outline-secondary badge" onclick="deleteEmployee(@employee.Id)" type="button">
         <i class="fa fa-trash"></i>
       </button>
     </div>
@@ -358,18 +373,16 @@
         let editedEmployeeId = 0;
         let isEdit = false;
 
-        function onClickEditEmployee(employee){
-            console.log(employee);
+        function onClickEditEmployee(fullName,email,dateOfBirth,age){
             isEdit = true;
             editedEmployeeId = employee.employeeId;
-            $('#fullName').val(employee.fullName);
-            $('#email').val(employee.email);
-            $('#dateOfBirth').val(employee.dateOfBirth);
-            $('#age').val(employee.age);
+            $('#fullName').val(fullName);
+            $('#email').val(email);
+            $('#dateOfBirth').val(dateOfBirth);
+            $('#age').val(age);
         }
 
         function onClickNewEmployee(employee) {
-
             isEdit = false;
             editedEmployeeId = 0;
             $('#fullName').val("");
@@ -400,7 +413,7 @@
             data: JSON.stringify(newEmployee),
             dataType: 'json',
             success: function (response) {
-                $('#employee-list').append(renderNewEmployee(response));
+                $('#employee-list').append(renderNewEmployee(response.fullName,response.email,response.dateOfBirth,response.age));
             }
             });
         }
@@ -414,6 +427,7 @@
         }
 
         function deleteEmployee(employeeId){
+            console.log(employeeId);
             $.ajax({
             url: url + '/' + employeeId,
             type: 'DELETE',
@@ -426,19 +440,19 @@
             })
         }
 
-        function renderNewEmployee(newEmployee){
+        function renderNewEmployee(fullName,email,dateOfBirth,age){
             return  "<tr>"  +
                         "<td class=\"align-middle text-center\">" +
                              "<div class=\"bg-light d-inline-flex justify-content-center align-items-center align-top\" style=\"width: 35px; height: 35px; border-radius: 3px\">" +
-                                newEmployee.fullName +
+                                fullName +
                              "</div>" +
                         "</td>" +
-                        "<td class=\"text-nowrap align-middle\">" + newEmployee.email + "</td>" +
-                "<td class=\"text-nowrap align-middle\"><span>" + newEmployee.dateOfBirth + "</span></td>" +
-                        "<td class=\"text-center align-middle\"><span>" + newEmployee.age + "</span></td>" + 
+                        "<td class=\"text-nowrap align-middle\">" + email + "</td>" +
+                "<td class=\"text-nowrap align-middle\"><span>" + dateOfBirth + "</span></td>" +
+                        "<td class=\"text-center align-middle\"><span>" + age + "</span></td>" + 
                         "<td class=\"text-center align-middle\">" +
                             "<div class=\"btn-group align-top\">" +
-                "<button class=\"btn btn-sm btn-outline-secondary badge\" type=\"button\" data-toggle=\"modal\" data-target=\"#user-form-modal\" onclick=\"onClickEditEmployee(newEmployee)\">Edit</button>" +
+                "<button class=\"btn btn-sm btn-outline-secondary badge\" type=\"button\" data-toggle=\"modal\" data-target=\"#user-form-modal\" onclick=\"onClickEditEmployee("+fullName+","+email+","+dateOfBirth+","+age+")"+">Edit</button>" +
                     "<button class=\"btn btn-sm btn-outline-secondary badge\" type=\"button\">" + 
                                      "<i class=\"fa fa-trash\"></i>" + 
                                 "</button>" +

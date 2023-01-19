@@ -1,6 +1,6 @@
 ﻿namespace Marcus.Umbraco.Model
 {
-    public class Employee
+    public class EmployeeModel
     {
         public int Id { get; set; }
         public string? ContentName { get; set; }
