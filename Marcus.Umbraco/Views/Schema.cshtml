@@ -1,28 +1,14 @@
-﻿@using Marcus.Umbraco.Model
+﻿@*@using Marcus.Umbraco.Model
 @using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Schema>
-@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Schema>;
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;*@
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-
-    <title>Employee CRUD</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
-    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha512-CryKbMe7sjSCDPl18jtJI5DR5jtkUWxPXWaLCst6QjH8wxDexfRJic2WRmRXmstr2Y8SxDDWuBO6CQC6IE4KTA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
-  </head>
-  <body>
-    <link
-      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
-      rel="stylesheet"
-    />
+<script src="/js/schema.js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha512-CryKbMe7sjSCDPl18jtJI5DR5jtkUWxPXWaLCst6QjH8wxDexfRJic2WRmRXmstr2Y8SxDDWuBO6CQC6IE4KTA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"/>
     <div data-toggle="modal" data-target="#user-form-modal" id="modal-controller"></div>
     <div class="container">
       <div class="row flex-lg-nowrap">
@@ -57,7 +43,7 @@
                           </tr>
                         </thead>
                         <tbody id="employee-list">
-                               @{
+                               @*@{
                                 var selection = Umbraco.ContentAtXPath("//employee").Where(x => x.IsVisible());
                                 }
                             	@foreach (var item in selection)
@@ -96,7 +82,7 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-                            	}
+                            	}*@
                         </tbody>
                       </table>
                     </div>
@@ -254,7 +240,7 @@
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title">Create User</h5>
+                  <h5 class="modal-title" id="modal-title"></h5>
                   <button type="button" class="close" data-dismiss="modal">
                     <span aria-hidden="true">×</span>
                   </button>
@@ -299,6 +285,7 @@
                                 />
                               </div>
                               <label id="email-warning" style="color :red">Email is required!</label>
+                              <label id="email-invalid-warning" style="color :red">Email is invalid!</label>
                             </div>
                             <div class="col">
                               <div class="form-group">
@@ -330,7 +317,7 @@
         </div>
       </div>
     </div>
-    <style type="text/css">
+<style type="text/css">
       body {
         margin-top: 20px;
         background: #f8f8f8;
@@ -339,20 +326,24 @@
         width : 100%;
         max-width : 100% !important;
       }
-    </style>
-    <script type="text/javascript" src="../js/schema.js"></script>
-    <script type="text/javascript">
-let url = "http://localhost:1610/api/employee";
+</style>
+<script type="text/javascript">
+let url = "http://localhost:25523/api/employee";
 let selectedEmployees = [];
 
 let editedEmployeeId = 0;
 let isEdit = false;
 
-resetWarning();
+window.onload = function () {
+    console.log('Loading employees...');
+    resetWarning();
+    loadEmployees();
+};
 
 function onClickEditEmployee(id, fullName, email, dateOfBirth, age) {
     isEdit = true;
     editedEmployeeId = id;
+    $('#modal-title').text("Edit "+ fullName);
     $('#fullName').val(fullName);
     $('#email').val(email);
     $('#dateOfBirth').val(dateOfBirth);
@@ -362,6 +353,7 @@ function onClickEditEmployee(id, fullName, email, dateOfBirth, age) {
 function onClickNewEmployee(employee) {
     isEdit = false;
     editedEmployeeId = 0;
+    $('#modal-title').text("New Employee");
     $('#fullName').val("");
     $('#email').val("");
     $('#dateOfBirth').val("");
@@ -392,6 +384,12 @@ function editEmployee() {
           resetWarning();
           $('#modal-controller').click();
           $('#' + editedEmployeeId).replaceWith(renderNewEmployee(newEmployee.id,newEmployee.fullName,newEmployee.email,newEmployee.dateOfBirth,newEmployee.age))
+     },
+     error: function (jqXHR,text,error) {
+         let errors = JSON.parse(jqXHR.responseText);
+         if(errors[0] === "Email is invalid"){
+                $('#email-invalid-warning').show();
+         }
      }
      });
 }
@@ -421,6 +419,12 @@ function addEmployee() {
             resetWarning();
             $('#modal-controller').click();
             $('#employee-list').append(renderNewEmployee(response.id, response.fullName, response.email, response.dateOfBirth, response.age));
+        },
+        error : function(jqXHR,text,error){
+            let errors = JSON.parse(jqXHR.responseText);
+            if(errors[0] === "Email is invalid"){
+                $('#email-invalid-warning').show();
+            }
         }
     });
 }
@@ -445,6 +449,7 @@ function deleteEmployee(employeeId) {
 }
 
 function renderNewEmployee(id, fullName, email, dateOfBirth, age) {
+    var removedZDate = dateOfBirth.replace('Z','');
     var date = new Date(dateOfBirth);
             var dateOfBirthFormat = ((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
     //var dateOfBirthFormatMoment = moment(dateOfBirth).format('L');
@@ -463,7 +468,7 @@ function renderNewEmployee(id, fullName, email, dateOfBirth, age) {
         "<button class=\"btn btn-sm btn-outline-secondary badge\"" +
         "type=\"button\"" +
         "data-toggle=\"modal\" data-target=\"#user-form-modal\"" +
-        "onclick=\"onClickEditEmployee(" + `'${id}','${fullName}','${email}','${dateOfBirth}','${age}'` + ")\">" +
+        "onclick=\"onClickEditEmployee(" + `'${id}','${fullName}','${email}','${removedZDate}','${age}'` + ")\">" +
         "Edit" +
         "</button>" +
         "<button class=\"btn btn-sm btn-outline-secondary badge\" onclick=\"deleteEmployee('" + `${id}` + "')\" type=\"button\">" +
@@ -472,6 +477,18 @@ function renderNewEmployee(id, fullName, email, dateOfBirth, age) {
         "</div>" +
         "</td>" +
         "</tr>";
+}
+
+function loadEmployees(){
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                for(var i = 0; i < response.length ; i ++){
+                    $('#employee-list').append(renderNewEmployee(response[i].id, response[i].fullName, response[i].email, response[i].dateOfBirth, response[i].age));
+                }
+            },
+        })
 }
 
 function validate() {
@@ -506,13 +523,8 @@ function resetWarning() {
     $('#date-warning').hide();
     $('#email-warning').hide();
     $('#age-warning').hide();
+    $('#email-invalid-warning').hide();
 }
-    </script>
-  </body>
-</html>
-
-@{
-	Layout = null; 
-}
+</script>
 
 

@@ -4,6 +4,7 @@ using Marcus.Umbraco.Model;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
+using Marcus.Service;
 
 namespace Marcus.Umbraco.Controller
 {
@@ -75,6 +76,11 @@ namespace Marcus.Umbraco.Controller
             try
             {
                 //Validate
+                var errors = Validate(employee);
+                if(errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
 
                 var employeesNode = _umbracoHelper.ContentSingleAtXPath("//schema");
                 if (employeesNode == null)
@@ -133,6 +139,13 @@ namespace Marcus.Umbraco.Controller
         {
             try
             {
+                //Validate
+                var errors = Validate(newVersion);
+                if(errors.Count > 0)
+                {
+                    return BadRequest(errors);
+                }
+
                 var content = _contentService.GetById(newVersion.Id);
                 if(content == null)
                 {
@@ -152,6 +165,28 @@ namespace Marcus.Umbraco.Controller
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        private List<string> Validate(EmployeeModel employee)
+        {
+            var errors = new List<string>();
+            if(String.IsNullOrEmpty(employee.Email) || String.IsNullOrWhiteSpace(employee.Email))
+            {
+                errors.Add("Email is empty");
+            }
+            else if (!Validator.IsValidEmail(employee.Email))
+            {
+                errors.Add("Email is invalid");
+            }
+            if (!Validator.IsValidName(employee.FullName))
+            {
+                errors.Add("Name is empty");
+            }
+            if (!Validator.IsValidAge(employee.Age))
+            {
+                errors.Add("Age must greater than 0");
+            }
+            return errors;
         }
     }
 }

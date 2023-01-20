@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marcus.Umbraco", "Marcus.Umbraco\Marcus.Umbraco.csproj", "{A578BCF8-3B36-4815-B762-7B28602BA2A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marcus.Umbraco", "Marcus.Umbraco\Marcus.Umbraco.csproj", "{A578BCF8-3B36-4815-B762-7B28602BA2A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marcus.Service", "Marcus.Service\Marcus.Service.csproj", "{6CAB895E-D208-4118-8CD8-1A2984F8264E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{A578BCF8-3B36-4815-B762-7B28602BA2A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A578BCF8-3B36-4815-B762-7B28602BA2A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A578BCF8-3B36-4815-B762-7B28602BA2A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CAB895E-D208-4118-8CD8-1A2984F8264E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CAB895E-D208-4118-8CD8-1A2984F8264E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CAB895E-D208-4118-8CD8-1A2984F8264E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CAB895E-D208-4118-8CD8-1A2984F8264E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
